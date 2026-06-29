@@ -1,5 +1,7 @@
 # GitHub Profile Reviewer
 
+[![CI](https://github.com/sathvik458/GitHub-Profile-Reviewer/actions/workflows/ci.yml/badge.svg)](https://github.com/sathvik458/GitHub-Profile-Reviewer/actions/workflows/ci.yml)
+
 An API that will analyze a GitHub user's profile and return useful engineering insights.
 
 ## Run
