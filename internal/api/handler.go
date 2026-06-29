@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github-profile-reviewer/internal/github"
+	"github-profile-reviewer/internal/models"
 )
 
 type Handler struct {
@@ -44,6 +45,17 @@ func (h *Handler) Profile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	repositories, err := h.githubClient.FetchRepositories(r.Context(), username)
+	if err != nil {
+		http.Error(w, "failed to fetch github repositories", http.StatusBadGateway)
+		return
+	}
+
+	response := models.ProfileResponse{
+		User:         user,
+		Repositories: repositories,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(response)
 }
