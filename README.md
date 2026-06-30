@@ -31,3 +31,5 @@ http://localhost:8080/profile/octocat
 ```
 
 The response includes the user's profile and up to 100 recently updated public repositories.
+
+The response also includes starter analysis scores for documentation, repository quality, and activity.

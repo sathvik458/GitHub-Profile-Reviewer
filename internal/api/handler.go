@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github-profile-reviewer/internal/analyzer"
 	"github-profile-reviewer/internal/github"
 	"github-profile-reviewer/internal/models"
 )
@@ -54,6 +55,7 @@ func (h *Handler) Profile(w http.ResponseWriter, r *http.Request) {
 	response := models.ProfileResponse{
 		User:         user,
 		Repositories: repositories,
+		Analysis:     analyzer.Analyze(repositories),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
