@@ -7,11 +7,42 @@ import (
 )
 
 func Analyze(repositories []models.Repository) models.Analysis {
-	return models.Analysis{
+	analysis := models.Analysis{
 		DocumentationScore: documentationScore(repositories),
 		RepositoryScore:    repositoryScore(repositories),
 		ActivityScore:      activityScore(repositories, time.Now()),
 	}
+
+	analysis.OverallScore = overallScore(analysis)
+	analysis.Recommendations = recommendations(analysis)
+
+	return analysis
+}
+
+func overallScore(analysis models.Analysis) int {
+	return (analysis.DocumentationScore + analysis.RepositoryScore + analysis.ActivityScore) / 3
+}
+
+func recommendations(analysis models.Analysis) []string {
+	var items []string
+
+	if analysis.DocumentationScore < 70 {
+		items = append(items, "Add clear descriptions, licenses, and topics to more repositories.")
+	}
+
+	if analysis.RepositoryScore < 70 {
+		items = append(items, "Highlight original, maintained repositories with project structure and quality signals.")
+	}
+
+	if analysis.ActivityScore < 70 {
+		items = append(items, "Push recent improvements to important repositories to show active engineering work.")
+	}
+
+	if len(items) == 0 {
+		items = append(items, "Profile has strong repository signals. Keep projects current and well documented.")
+	}
+
+	return items
 }
 
 func documentationScore(repositories []models.Repository) int {
