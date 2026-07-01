@@ -1,8 +1,8 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 
@@ -23,7 +23,8 @@ func NewHandler(githubClient *github.Client) *Handler {
 
 func (h *Handler) Profile(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		w.Header().Set("Allow", http.MethodGet)
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 		return
 	}
 
@@ -31,24 +32,26 @@ func (h *Handler) Profile(w http.ResponseWriter, r *http.Request) {
 	username = strings.TrimSpace(username)
 
 	if username == "" || strings.Contains(username, "/") {
-		http.Error(w, "username is required", http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "username is required")
 		return
 	}
 
 	user, err := h.githubClient.FetchUser(r.Context(), username)
 	if err != nil {
 		if errors.Is(err, github.ErrUserNotFound) {
-			http.Error(w, "github user not found", http.StatusNotFound)
+			writeError(w, http.StatusNotFound, "github user not found")
 			return
 		}
 
-		http.Error(w, "failed to fetch github profile", http.StatusBadGateway)
+		log.Printf("failed to fetch github profile for %q: %v", username, err)
+		writeError(w, http.StatusBadGateway, "failed to fetch github profile")
 		return
 	}
 
 	repositories, err := h.githubClient.FetchRepositories(r.Context(), username)
 	if err != nil {
-		http.Error(w, "failed to fetch github repositories", http.StatusBadGateway)
+		log.Printf("failed to fetch github repositories for %q: %v", username, err)
+		writeError(w, http.StatusBadGateway, "failed to fetch github repositories")
 		return
 	}
 
@@ -58,6 +61,5 @@ func (h *Handler) Profile(w http.ResponseWriter, r *http.Request) {
 		Analysis:     analyzer.Analyze(repositories),
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	writeJSON(w, http.StatusOK, response)
 }
