@@ -41,3 +41,5 @@ Errors are returned as JSON:
   "error": "github user not found"
 }
 ```
+
+The API handler is tested with a fake GitHub client, so tests do not call the real GitHub API.

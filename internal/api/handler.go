@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"errors"
 	"log"
 	"net/http"
@@ -11,11 +12,16 @@ import (
 	"github-profile-reviewer/internal/models"
 )
 
-type Handler struct {
-	githubClient *github.Client
+type GitHubClient interface {
+	FetchUser(ctx context.Context, username string) (models.GitHubUser, error)
+	FetchRepositories(ctx context.Context, username string) ([]models.Repository, error)
 }
 
-func NewHandler(githubClient *github.Client) *Handler {
+type Handler struct {
+	githubClient GitHubClient
+}
+
+func NewHandler(githubClient GitHubClient) *Handler {
 	return &Handler{
 		githubClient: githubClient,
 	}
