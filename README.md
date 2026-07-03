@@ -43,3 +43,5 @@ Errors are returned as JSON:
 ```
 
 The API handler is tested with a fake GitHub client, so tests do not call the real GitHub API.
+
+The GitHub client is tested with a fake HTTP transport, so outbound API behavior is covered without external network calls.

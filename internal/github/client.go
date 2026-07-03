@@ -85,8 +85,20 @@ func (c *Client) get(ctx context.Context, apiURL string, target any) error {
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return fmt.Errorf("github returned status %d", resp.StatusCode)
+		return githubStatusError(resp)
 	}
 
 	return json.NewDecoder(resp.Body).Decode(target)
+}
+
+func githubStatusError(resp *http.Response) error {
+	var body struct {
+		Message string `json:"message"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&body); err == nil && body.Message != "" {
+		return fmt.Errorf("github returned status %d: %s", resp.StatusCode, body.Message)
+	}
+
+	return fmt.Errorf("github returned status %d", resp.StatusCode)
 }
