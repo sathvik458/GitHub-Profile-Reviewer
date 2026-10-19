@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitHub Profile Reviewer</title>
+  <meta name="description" content="Analyze any GitHub profile and get engineering insights — documentation quality, repo health, and activity scores." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-inner">
+        <div class="logo">
+          <span class="logo-icon">&#9670;</span>
+          <span class="logo-text">Profile Reviewer</span>
+        </div>
+        <nav class="header-nav">
+          <a href="https://github.com" target="_blank" rel="noopener" class="nav-link">GitHub</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero / Search -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero-badge">GitHub Profile Analysis</p>
+      <h1 class="hero-title">Review any GitHub profile</h1>
+      <p class="hero-subtitle">
+        Enter a GitHub username to get documentation quality, repository health,
+        and activity scores — all in one place.
+      </p>
+
+      <form class="search-form" id="search-form" autocomplete="off">
+        <div class="search-box">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            id="username-input"
+            class="search-input"
+            placeholder="Enter GitHub username…"
+            spellcheck="false"
+            autofocus
+          />
+          <button type="submit" class="search-btn" id="search-btn">
+            Analyze
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Results area -->
+  <main class="main-content" id="results" aria-live="polite">
+    <div class="container">
+
+      <!-- Error banner -->
+      <div class="error-banner hidden" id="error-banner" role="alert">
+        <span id="error-message">Something went wrong.</span>
+      </div>
+
+      <!-- Loading state -->
+      <div class="loading-state hidden" id="loading-state" aria-label="Loading profile data">
+        <div class="spinner"></div>
+        <p>Fetching profile…</p>
+      </div>
+
+      <!-- Profile result (hidden until data loads) -->
+      <div class="profile-result hidden" id="profile-result">
+
+        <!-- Profile header card -->
+        <div class="profile-card" id="profile-card">
+          <div class="profile-avatar-wrap">
+            <img class="profile-avatar" id="profile-avatar" src="" alt="GitHub avatar" width="64" height="64" />
+          </div>
+          <div class="profile-info">
+            <h2 class="profile-name" id="profile-name"></h2>
+            <p class="profile-login" id="profile-login"></p>
+            <p class="profile-bio" id="profile-bio"></p>
+          </div>
+          <div class="profile-stats">
+            <div class="stat-item">
+              <span class="stat-value" id="stat-repos">—</span>
+              <span class="stat-label">Repos</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-followers">—</span>
+              <span class="stat-label">Followers</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value" id="stat-following">—</span>
+              <span class="stat-label">Following</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two-column layout: scores + repos -->
+        <div class="content-grid">
+
+          <!-- Left column: analysis -->
+          <div class="col-left">
+
+            <!-- Score section -->
+            <div class="section-card" id="scores-card">
+              <div class="section-header">
+                <h3 class="section-title">Analysis Scores</h3>
+                <span class="overall-badge" id="overall-badge">—</span>
+              </div>
+
+              <div class="score-list">
+                <div class="score-row">
+                  <span class="score-label">Documentation</span>
+                  <div class="score-bar-wrap">
+                    <div class="score-bar" id="bar-doc" style="width:0%"></div>
+                  </div>
+                  <span class="score-num" id="num-doc">—</span>
+                </div>
+                <div class="score-row">
+                  <span class="score-label">Repository Quality</span>
+                  <div class="score-bar-wrap">
+                    <div class="score-bar" id="bar-repo" style="width:0%"></div>
+                  </div>
+                  <span class="score-num" id="num-repo">—</span>
+                </div>
+                <div class="score-row">
+                  <span class="score-label">Activity</span>
+                  <div class="score-bar-wrap">
+                    <div class="score-bar" id="bar-activity" style="width:0%"></div>
+                  </div>
+                  <span class="score-num" id="num-activity">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recommendations -->
+            <div class="section-card" id="recommendations-card">
+              <div class="section-header">
+                <h3 class="section-title">Recommendations</h3>
+              </div>
+              <ul class="recommendation-list" id="recommendation-list"></ul>
+            </div>
+
+          </div>
+
+          <!-- Right column: repositories -->
+          <div class="col-right">
+            <div class="section-card" id="repos-card">
+              <div class="section-header">
+                <h3 class="section-title">Repositories</h3>
+                <span class="repo-count" id="repo-count"></span>
+              </div>
+              <ul class="repo-list" id="repo-list"></ul>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p class="footer-text">
+        Built with Go &amp; vanilla JS &nbsp;·&nbsp;
+        <a href="https://github.com/sathvik458/GitHub-Profile-Reviewer" target="_blank" rel="noopener" class="footer-link">View source</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
